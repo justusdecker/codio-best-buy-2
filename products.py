@@ -102,7 +102,7 @@ class Product:
 
     def show(self) -> str:
         """ Get a formatted string """
-        return f"{self.name:<30} {self.price:<6} {self.quantity:<15}" # titles like name, price & quanity will be printed in the main function! Looks better!
+        return f"{self.name:<30} {self.price:<6} {self.quantity:<5}" # titles like name, price & quanity will be printed in the main function! Looks better!
     
     def buy(self,quantity: int) -> float | int:
         """
@@ -120,3 +120,41 @@ class Product:
         if self.quantity == 0:
             self.deactivate()
         return quantity * self.price
+    
+    
+class NonStockedProduct(Product):
+    """
+    Some products in the store are not physical, so we don’t need to keep track of their quantity. 
+    For example - a Microsoft Windows license. 
+    On these products, the quantity should be set to zero and always stay that way.
+    """
+    def __init__(self, name, price):
+        super().__init__(name, price, 0)
+    def show(self) -> str:
+        """ Get a formatted string """
+        return f"{self.name:<30} {self.price:<6} unlimited"
+    def buy(self,quantity: int) -> float | int:
+        """
+        - Get the price
+        Raises an Exception if type is incorrect
+        """
+        if not isinstance(quantity,int):
+            raise TypeError("Quantity is not an integer!")
+        if quantity < 0:
+            raise ValueError("Quantity cannot below 0")
+        return quantity * self.price
+class LimitedProduct(Product):
+    """
+    Some products can only be purchased X times in an order. For example - a shipping fee can only be added once. 
+    If an order is attempted with quantity larger than the maximum one, it should be refused with an exception.
+    """
+    def __init__(self, name, price, quantity, max_allowed_quantity: int):
+        super().__init__(name, price, quantity)
+        self.max_allow_quantity = max_allowed_quantity
+    def show(self) -> str:
+        """ Get a formatted string """
+        return f"{self.name:<30} {self.price:<6} {self.quantity:<5}(*{self.max_allow_quantity} in order)"
+    def buy(self, quantity):
+        if quantity > self.max_allow_quantity:
+            raise ValueError(f'You are not allowed to buy more than {self.max_allow_quantity} in a single order!')
+        return super().buy(quantity)
