@@ -1,4 +1,4 @@
-from products import Product
+from products import Product, NonStockedProduct, LimitedProduct
 class Store:
     """
     A Class that will manage Products
@@ -7,7 +7,9 @@ class Store:
         self.products = [
             Product("Bose QuietComfort Earbuds", price=250, quantity=500),
             Product("MacBook Air M2", price=1450, quantity=100),
-            Product("A Big Tasty Bacon", price=250, quantity=500)] #I'm hungry 🤤
+            Product("A Big Tasty Bacon", price=250, quantity=500),
+            NonStockedProduct('Windows License',125),
+            LimitedProduct('Shipping',10,250,1)] #I'm hungry 🤤
     def remove_product(self,product: Product):
         """ Remove a given Product from ``products`` """
         self.products.remove(product)
