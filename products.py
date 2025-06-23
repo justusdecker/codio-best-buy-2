@@ -1,3 +1,4 @@
+from promotions import Promotion
 class Product:
     """
     A product will have:
@@ -14,7 +15,20 @@ class Product:
         self.set_name(name)
         self.set_price(price)
         self.set_quantity(quantity)
+        self._promotion: Promotion | None = None
         self.active : bool = True
+    def get_promotion(self) -> Promotion | None:
+        """
+        Returns the current promotion applied to the product.
+        """
+        return self._promotion
+    def set_promotion(self, promotion: Promotion | None):
+        """
+        Sets a promotion for the product. Set to None to remove the promotion.
+        """
+        if promotion is not None and not isinstance(promotion, Promotion):
+            raise TypeError("Promotion must be an instance of the Promotion class or None.")
+        self._promotion = promotion
     def _check_name(self,value: str) -> None:
         """
         Will check for edge cases before ``name`` will be set
@@ -102,7 +116,7 @@ class Product:
 
     def show(self) -> str:
         """ Get a formatted string """
-        return f"{self.name:<30} {self.price:<6} {self.quantity:<5}" # titles like name, price & quanity will be printed in the main function! Looks better!
+        return f"{self.name:<30} {self.price:<6} {self.quantity:<15} {self.get_promotion().name if self.get_promotion() is not None else ''}" # titles like name, price & quanity will be printed in the main function! Looks better!
     
     def buy(self,quantity: int) -> float | int:
         """
@@ -119,6 +133,8 @@ class Product:
         self.quantity -= quantity
         if self.quantity == 0:
             self.deactivate()
+        if self.get_promotion() is not None:
+            return self.get_promotion().apply_promotion(self,quantity)
         return quantity * self.price
     
     
@@ -132,7 +148,7 @@ class NonStockedProduct(Product):
         super().__init__(name, price, 0)
     def show(self) -> str:
         """ Get a formatted string """
-        return f"{self.name:<30} {self.price:<6} unlimited"
+        return f"{self.name:<30} {self.price:<6} {'unlimited':<15} {self.get_promotion().name if self.get_promotion() is not None else ''}"
     def buy(self,quantity: int) -> float | int:
         """
         - Get the price
@@ -142,6 +158,8 @@ class NonStockedProduct(Product):
             raise TypeError("Quantity is not an integer!")
         if quantity < 0:
             raise ValueError("Quantity cannot below 0")
+        if self.get_promotion() is not None:
+            return self.get_promotion().apply_promotion(self,quantity)
         return quantity * self.price
 class LimitedProduct(Product):
     """
@@ -153,8 +171,9 @@ class LimitedProduct(Product):
         self.max_allow_quantity = max_allowed_quantity
     def show(self) -> str:
         """ Get a formatted string """
-        return f"{self.name:<30} {self.price:<6} {self.quantity:<5}(*{self.max_allow_quantity} in order)"
+        return f"{self.name:<30} {self.price:<6} {self.quantity:<15}(*{self.max_allow_quantity} in order) {self.get_promotion().name if self.get_promotion() is not None else ''}"
     def buy(self, quantity):
         if quantity > self.max_allow_quantity:
             raise ValueError(f'You are not allowed to buy more than {self.max_allow_quantity} in a single order!')
         return super().buy(quantity)
+    
