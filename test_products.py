@@ -1,4 +1,5 @@
 from products import Product, NonStockedProduct, LimitedProduct
+from promotions import SecondHalfPrice, BOGO, PercentDiscount
 import pytest
 def test_create_product():
     #Test that creating a normal product works.
@@ -36,5 +37,28 @@ def test_buy_nonstock_no_below_zero():
     assert PRODUCT.get_quantity() == 0
 def test_buy_max_allowed_limited():
     PRODUCT = LimitedProduct("Shipping", price=10,quantity=10, max_allowed_quantity=1)
+    PRODUCT.buy(10)
     with pytest.raises(ValueError):
         PRODUCT.buy(10)
+def test_promotion_second_half_price():
+    PRODUCT = Product("test", price=100, quantity=100)
+    SHP = SecondHalfPrice()
+    price = SHP.apply_promotion(PRODUCT,2)
+    assert price == 150
+    price = SHP.apply_promotion(PRODUCT,3)
+    assert price == 250
+def test_promotion_bogo():
+    PRODUCT = Product("test", price=100, quantity=100)
+    SHP = BOGO()
+    price = SHP.apply_promotion(PRODUCT,2)
+    assert price == 100
+    price = SHP.apply_promotion(PRODUCT,3)
+    assert price == 200
+def test_promotion_percent_discount():
+    PRODUCT = Product("test", price=100, quantity=100)
+    SHP = PercentDiscount(10)
+    price = SHP.apply_promotion(PRODUCT,1)
+    assert price == 90
+    price = SHP.apply_promotion(PRODUCT,2)
+    assert price == 190
+    
