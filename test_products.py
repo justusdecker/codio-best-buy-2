@@ -37,7 +37,6 @@ def test_buy_nonstock_no_below_zero():
     assert PRODUCT.get_quantity() == 0
 def test_buy_max_allowed_limited():
     PRODUCT = LimitedProduct("Shipping", price=10,quantity=10, max_allowed_quantity=1)
-    PRODUCT.buy(10)
     with pytest.raises(ValueError):
         PRODUCT.buy(10)
 def test_promotion_second_half_price():
@@ -60,5 +59,5 @@ def test_promotion_percent_discount():
     price = SHP.apply_promotion(PRODUCT,1)
     assert price == 90
     price = SHP.apply_promotion(PRODUCT,2)
-    assert price == 190
+    assert price == 180
     
