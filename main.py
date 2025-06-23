@@ -1,4 +1,5 @@
 from store import Store
+from promotions import SecondHalfPrice, BOGO, PercentDiscount
 STORE = Store()
 MENU = """
 Welcome to BestBuy!
@@ -11,6 +12,10 @@ Welcome to BestBuy!
 
 def main():
     is_running = True
+    
+    STORE.products[0].set_promotion(SecondHalfPrice())
+    STORE.products[1].set_promotion(BOGO())
+    STORE.products[2].set_promotion(PercentDiscount(10))
     while is_running:
         print(MENU)
         user_input = input('Please choose a number: ')
