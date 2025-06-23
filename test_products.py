@@ -1,4 +1,4 @@
-from products import Product
+from products import Product, NonStockedProduct, LimitedProduct
 import pytest
 def test_create_product():
     #Test that creating a normal product works.
@@ -26,5 +26,15 @@ def test_buy_modifies_quantity():
     PRODUCT = Product('Test',10,3)
     assert PRODUCT.buy(1) == PRODUCT.price
     assert PRODUCT.quantity == 2
-    
-    
+def test_create_limited_product():
+    LimitedProduct("Shipping", price=10, quantity=250, max_allowed_quantity=1)
+def test_create_non_stock_product():
+    NonStockedProduct("Windows License", price=10)
+def test_buy_nonstock_no_below_zero():
+    PRODUCT = NonStockedProduct("Windows License", price=10)
+    PRODUCT.buy(10)
+    assert PRODUCT.get_quantity() == 0
+def test_buy_max_allowed_limited():
+    PRODUCT = LimitedProduct("Shipping", price=10,quantity=10, max_allowed_quantity=1)
+    with pytest.raises(ValueError):
+        PRODUCT.buy(10)
